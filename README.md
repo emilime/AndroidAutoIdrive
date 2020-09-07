@@ -23,9 +23,9 @@ Android Auto for IDrive, combined with the safety benefits of the tactile IDrive
 Getting Started
 ---------------
 
-This app communicates with the BMW or Mini Connected app for your car, and also requires the Connected Classic app of the other brand installed to authenticate to the car. For example, if you have the BMW Connected app for your BMW, you should install the Mini Connected Classic app.
+This app requires that the BMW or Mini Connected app for your car is installed and can successfully add Connected and Calendar entries to your car's Connected Apps menu.
 
-Download the APK from the [Releases page](https://github.com/hufman/AndroidAutoIdrive/releases/latest). Choose the one that says "sentry" to automatically upload crash reports, or choose "nonalytics" otherwise. After starting, the app should detect the Connected Classic app and start waiting for the car connection.
+Download the APK from the [Releases page](https://github.com/hufman/AndroidAutoIdrive/releases/latest). Choose the one that says "sentry" to automatically upload crash reports, or choose "nonalytics" otherwise. After starting, the app should detect the Connected app and start waiting for the car connection.
 
 Check out the [FAQ](https://hufman.github.io/AndroidAutoIdrive/faq.html) if you run into problems.
 
@@ -40,7 +40,7 @@ See [this guide](https://hufman.github.io/AndroidAutoIdrive/connection.html) for
 
 ![Phone App List](https://hufman.github.io/AndroidAutoIdrive/images/screenshot-phoneapps.jpg)
 
-After all the apps are connected, a bunch of new entries will show up in the car's Connected menu. Besides the official Calendar and Connected apps (and the Spotify app if running over Bluetooth), there should be a new Audioplayer icon and a book icon with no label. This book icon is the Notifications app.
+After all the apps are connected, a bunch of new entries will show up in the car's Connected menu. Besides the official Calendar and Connected apps, there should be a new Audioplayer icon and a book icon with no label. This book icon is the Notifications app, if enabled.
 
 ![Music App List](https://hufman.github.io/AndroidAutoIdrive/images/screenshot-medialist.jpg)
 
@@ -49,6 +49,10 @@ Several new entries will be added to the Media section of the control screen. Th
 Implemented Features
 --------------------
 
+  - Google Assistant
+    - Any voice assistant installed on the phone is added as a Connected App entry
+    - Google Assistant works the best, but Alexa, Bixby, and Cortana are also compatible
+    - The voice assistant app can be set as a hardware shortcut button for convenience
   - Phone Notifications
     - Popup about new notifications
     - Supports Dismiss, Mark As Read, or other notification actions
@@ -70,20 +74,27 @@ Implemented Features
         - [Google Play Books](https://play.google.com/store/apps/details?id=com.google.android.apps.books)
         - [iVooz](https://play.google.com/store/apps/details?id=com.ivoox.app)
         - [Libro.fm Audiobooks](https://play.google.com/store/apps/details?id=fm.libro.librofm)
+        - [Listen Audiobook Player](https://play.google.com/store/apps/details?id=com.acmeandroid.listen)
         - [Player FM](https://play.google.com/store/apps/details?id=fm.player)
+        - [Podcast Addict](https://play.google.com/store/apps/details?id=com.bambuna.podcastaddict)
         - [Voice Audiobook Player](https://play.google.com/store/apps/details?id=de.ph1b.audiobook)
       - Music Library
+        - [AIMP](https://play.google.com/store/apps/details?id=com.aimp.player)
         - [Black Player](https://play.google.com/store/apps/details?id=com.musicplayer.blackplayerfree)
         - [DSub](https://play.google.com/store/apps/details?id=github.daneren2005.dsub)
         - [jetAudio HD](https://play.google.com/store/apps/details?id=com.jetappfactory.jetaudio)
         - [Media Monkey](https://play.google.com/store/apps/details?id=com.ventismedia.android.mediamonkey)
+        - [Musicolet Music Player](https://play.google.com/store/apps/details?id=in.krosbits.musicolet)
+        - [Neutron Music Player](https://play.google.com/store/apps/details?id=com.neutroncode.mp)
         - [Plex](https://play.google.com/store/apps/details?id=com.plexapp.android) (only music and podcasts)
         - [PowerAmp](https://play.google.com/store/apps/details?id=com.maxmpz.audioplayer)
         - [Retro Music Player](https://play.google.com/store/apps/details?id=code.name.monkey.retromusic)
         - [Rocket Player](https://play.google.com/store/apps/details?id=com.jrtstudio.AnotherMusicPlayer)
+        - [TimberX Music Player](https://play.google.com/store/apps/details?id=com.naman14.timberx)
         - [VLC For Android](https://play.google.com/store/apps/details?id=org.videolan.vlc)
       - Radio
         - [AP News](https://play.google.com/store/apps/details?id=mnn.Android)
+        - [ARD Audiothek](https://play.google.com/store/apps/details?id=de.ard.audiothek)
         - [BFM](https://play.google.com/store/apps/details?id=my.bfm.app)
         - [Dash Radio](https://play.google.com/store/apps/details?id=com.dashradio.dash)
         - [Energy Radio](https://play.google.com/store/apps/details?id=radioenergy.app)
@@ -91,9 +102,14 @@ Implemented Features
         - [NHL](https://play.google.com/store/apps/details?id=com.nhl.gc1112.free)
         - [ntv Nachrichten](https://play.google.com/store/apps/details?id=de.lineas.lit.ntv.android)
         - [NYTimes](https://play.google.com/store/apps/details?id=com.nytimes.android)
+        - [R101](https://play.google.com/store/apps/details?id=it.r101)
+        - [Radio 105](https://play.google.com/store/apps/details?id=it.froggy.android.radio105)
         - [Radio FM](https://play.google.com/store/apps/details?id=com.radio.fmradio)
+        - [Radio Monte Carlo](https://play.google.com/store/apps/details?id=it.froggy.android.rmc)
+        - [RTL 102.5](https://play.google.com/store/apps/details?id=com.rtl.rtlapp)
         - [Scanner Radio](https://play.google.com/store/apps/details?id=com.scannerradio)
         - [SiriusXM](https://play.google.com/store/apps/details?id=com.sirius)
+        - [Simple Radio](https://play.google.com/store/apps/details?id=com.streema.simpleradio)
         - [sunshine live](https://play.google.com/store/apps/details?id=app.sunshinelive.de.sunshinelive)
         - [Versuz Radio](https://play.google.com/store/apps/details?id=com.versuzradio)
         - [Virgin Radio Italy](https://play.google.com/store/apps/details?id=it.froggy.android.virginradio)
@@ -109,12 +125,13 @@ Integration Points
 Besides showing a self-contained remote UI, the IDrive system offers many exciting integration points. Here are a few that this project supports:
 
   - The UI widgets automatically take on the respective theme to fit the car
-  - The Map View, Notification List, and Music Playback screens can be assigned to the physical shortcut buttons in the dashboard
-  - New notifications trigger a popup in IDrive version 4
+  - The Assistants, Map View, Notification List, and Music Playback screens can be assigned to the physical shortcut buttons in the dashboard
+  - New notifications trigger a statusbar icon in IDrive version 4
+  - New notifications can trigger a popup in IDrive version 4
   - New notification popups can be disabled if a passenger is detected in the seat
   - The currently-playing app is displayed along the top of the IDrive screen
-  - The currently-playing song is shown in the Multimedia side panel of the IDrive
-  - On a MY2017+ car supporting Bluetooth Apps, audio focus can be enabled which grants the following extra features:
+  - The currently-playing song title is shown in the Multimedia side panel of the IDrive
+  - On a MY2017+ car supporting Bluetooth Apps, audio focus will be enabled which grants the following extra features:
     - The Media shortcut button opens this app when it is in control of the music
     - Automatically resumes playback when reconnecting to the car
     - Playback pauses when pushing the mute button or during calls
@@ -136,7 +153,7 @@ Due to the unofficial reverse-engineered nature of this project, it has some lim
   - The main menu entries' icons and text can't be altered, and so do not look exactly correct
   - The individual music source icons may not be fully functional, but they do switch the active music source
   - Android Oreo disabled Android Open Accessory Protocol 2 audio output, which is required to play audio over the app's USB connection in model years 2014-2017. Please listen over Bluetooth audio and use this app as a control interface.
-  - Some Android Auto music apps enforce a whitelist of clients, preventing this app from launching them or browsing their libraries. However, once they are running, they can be controlled. For example, these popular music apps can not be launched, they must be started manually:
+  - Some Android Auto music apps enforce a list of allowed client apps, preventing this app from launching them or browsing their libraries. However, once they are running, they can be controlled. For example, these popular music apps can not be launched, they must be started manually:
     - Amazon Music
     - Audible
     - Bandcamp
@@ -150,18 +167,17 @@ Due to the unofficial reverse-engineered nature of this project, it has some lim
     - Scribd
     - Smart Audiobook Player
     - YouTube Music
-  - Recent versions of Spotify block the standard Android MediaBrowserService connection, which is needed for the Search feature. Please downgrade to [version 8.4.96.953](https://www.apkhere.com/down/com.spotify.music_8.4.96.953_free) for full functionality.
+  - Recent versions of Spotify block the standard Android MediaBrowserService connection, which is needed for the Search feature. Downgrading to [version 8.4.96.953](https://www.apkhere.com/down/com.spotify.music_8.4.96.953_free) will enable this feature.
 
 Requirements
 ------------
 
-To communicate to the car, this project relies on the proxy connection that is created by the main Connected app on the phone. Both of the brand-specific Connected and the Connected Classic apps have been tested as compatible for this purpose.
+To communicate to the car, this project relies on the proxy connection that is created by the main Connected app on the phone. Both of the brand-specific Connected and the Connected Classic apps have been tested as compatible for this purpose, but the new Connected app is more reliable.
 
 Additionally, the car proposes a security challenge during the connection process, and this project asks the Security Service provided by the Connected apps for the correct response.
-However, the newer Connected app locked down this ability in version 5.1, which means the Connected Classic app must be installed to provide this response.
-For example, the user can install BMW Connected for the remote connectivity and better robustness with the Android memory manager, and install Mini Connected Classic to provide the Security Service for this project. Note that the Connected Classic app does not actually need to run, be logged in, or ever connected to the car!
-
-It is not recommended to install both the Connected and Connected Classic apps of the same brand, they will fight over the connection to the car and undefined results may happen. Instead, install the Connected Classic app of the other brand that is not intended to be used regularly.
+The normal Connected app should be enough for this, but it might be necessary to also install the Connected Classic app to provide the Security Service.
+If this is needed, it is not recommended to install both the Connected and Connected Classic apps of the same brand, they will fight over the connection to the car and undefined results may happen.
+Instead, install the Connected Classic app of the other brand that is not intended to be used regularly, such as BMW Connected and Mini Connected Classic.
 
 Build Instructions
 ------------------

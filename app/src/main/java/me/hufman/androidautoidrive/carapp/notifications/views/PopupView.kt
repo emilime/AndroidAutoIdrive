@@ -2,7 +2,7 @@ package me.hufman.androidautoidrive.carapp.notifications.views
 
 import android.util.Log
 import me.hufman.androidautoidrive.PhoneAppResources
-import me.hufman.androidautoidrive.carapp.notifications.CarNotification
+import me.hufman.androidautoidrive.notifications.CarNotification
 import me.hufman.androidautoidrive.carapp.notifications.PopupHistory
 import me.hufman.androidautoidrive.carapp.notifications.TAG
 import me.hufman.idriveconnectionkit.rhmi.*
@@ -20,6 +20,7 @@ class PopupView(val state: RHMIState, val phoneAppResources: PhoneAppResources, 
 	val bodyLabel1: RHMIModel.RaDataModel
 	val bodyLabel2: RHMIModel.RaDataModel
 	val popEvent: RHMIEvent.PopupEvent?
+	val focusEvent: RHMIEvent.FocusEvent?
 
 	init {
 		val dummyLabel = RHMIModel.RaDataModel(RHMIApplicationMock(), 0)
@@ -27,6 +28,7 @@ class PopupView(val state: RHMIState, val phoneAppResources: PhoneAppResources, 
 		bodyLabel1 = state.componentsList.filterIsInstance<RHMIComponent.Label>().firstOrNull()?.getModel()?.asRaDataModel() ?: dummyLabel
 		bodyLabel2 = state.componentsList.filterIsInstance<RHMIComponent.Label>().lastOrNull()?.getModel()?.asRaDataModel() ?: dummyLabel
 		popEvent = state.app.events.values.filterIsInstance<RHMIEvent.PopupEvent>().firstOrNull { it.getTarget() == state }
+		focusEvent = state.app.events.values.filterIsInstance<RHMIEvent.FocusEvent>().firstOrNull()
 	}
 
 	fun initWidgets() {
@@ -49,6 +51,12 @@ class PopupView(val state: RHMIState, val phoneAppResources: PhoneAppResources, 
 			popEvent?.triggerEvent(mapOf(0 to true))
 		} catch (e: Exception) {
 			Log.e(TAG, "Error while triggering notification popup: $e")
+
+			try {
+				focusEvent?.triggerEvent(mapOf(0 to state.id))
+			} catch (e: Exception) {
+				Log.e(TAG, "Error while focusing notification popup: $e")
+			}
 		}
 	}
 

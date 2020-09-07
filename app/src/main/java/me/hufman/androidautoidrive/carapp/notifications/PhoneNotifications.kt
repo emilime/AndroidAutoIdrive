@@ -15,6 +15,9 @@ import me.hufman.androidautoidrive.carapp.RHMIUtils
 import me.hufman.androidautoidrive.carapp.notifications.views.DetailsView
 import me.hufman.androidautoidrive.carapp.notifications.views.NotificationListView
 import me.hufman.androidautoidrive.carapp.notifications.views.PopupView
+import me.hufman.androidautoidrive.notifications.CarNotification
+import me.hufman.androidautoidrive.notifications.CarNotificationController
+import me.hufman.androidautoidrive.notifications.NotificationsState
 import me.hufman.idriveconnectionkit.IDriveConnection
 import me.hufman.idriveconnectionkit.rhmi.RHMIApplicationIdempotent
 import me.hufman.idriveconnectionkit.rhmi.RHMIApplicationSynchronized
@@ -97,7 +100,7 @@ class PhoneNotifications(securityAccess: SecurityAccess, val carAppAssets: CarAp
 		viewPopup.initWidgets()
 
 		// set up the details view
-		viewDetails.initWidgets(viewList)
+		viewDetails.initWidgets(viewList, stateInput)
 
 		// subscribe to CDS for passenger seat info
 		val cdsHandle = carConnection.cds_create()
@@ -208,6 +211,8 @@ class PhoneNotifications(securityAccess: SecurityAccess, val carAppAssets: CarAp
 	open inner class PhoneNotificationListener {
 		open fun onNotification(sbn: CarNotification) {
 			Log.i(TAG, "Received a new notification to show in the car: $sbn")
+			viewList.showStatusBarIcon()
+
 			if (AppSettings[AppSettings.KEYS.ENABLED_NOTIFICATIONS_POPUP].toBoolean() &&
 				(AppSettings[AppSettings.KEYS.ENABLED_NOTIFICATIONS_POPUP_PASSENGER].toBoolean() ||
 					!passengerSeated)
