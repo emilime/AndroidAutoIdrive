@@ -8,15 +8,16 @@ import android.os.Bundle
 import android.support.annotation.AttrRes
 import android.support.annotation.ColorInt
 import android.util.TypedValue
+import ar.com.hjg.pngj.*
+import ar.com.hjg.pngj.chunks.PngChunkPLTE
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.withTimeout
-import me.hufman.idriveconnectionkit.rhmi.RHMIComponent
-import me.hufman.idriveconnectionkit.rhmi.RHMIProperty
+import org.json.JSONException
+import org.json.JSONObject
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
 import java.util.zip.ZipInputStream
-import kotlin.math.abs
 
 object Utils {
 	val FILTER_NEGATIVE by lazy {
@@ -143,6 +144,71 @@ object Utils {
 		}
 		return contents
 	}
+
+	/**
+	 * Converts a 8 bit PNG file to a single channel grayscale 8 bit PNG. This supports both indexed
+	 * color and RGB/RGBA PNGs. The resulting PNG is returned as a ByteArray.
+	 */
+	fun convertPngToGrayscale(png: ByteArray): ByteArray {
+		val inputPngReader = PngReaderInt(png.inputStream())
+		if (inputPngReader.imgInfo.greyscale) {
+			return png
+		}
+
+		val outputImageSettings = ImageInfo(inputPngReader.imgInfo.cols, inputPngReader.imgInfo.rows, 8, false, true, false)
+		val byteArrayOutputStream = ByteArrayOutputStream()
+		val outputPngWriter = PngWriter(byteArrayOutputStream, outputImageSettings)
+		val outputImageLine = ImageLineInt(outputImageSettings)
+		val channels = inputPngReader.imgInfo.channels
+		val palette = if (inputPngReader.imgInfo.indexed) {
+			inputPngReader.chunksList.getById("PLTE")[0] as PngChunkPLTE
+		} else {
+			null
+		}
+
+		for (rowIndex in 0 until inputPngReader.imgInfo.rows) {
+			val inputImageLine = inputPngReader.readRow()
+			val scanLine = (inputImageLine as ImageLineInt).scanline
+			for (colIndex in 0 until inputPngReader.imgInfo.cols) {
+				val i = colIndex * channels
+				val grayscaleRgbVal = if (palette != null) {
+					getGrayscaleValue(palette.getEntry(scanLine[i]))
+				} else {
+					getGrayscaleValue(scanLine[i], scanLine[i + 1], scanLine[i + 2])
+				}
+				val grayscaleVal = if (channels == 4) { //rgba
+					val alpha = scanLine[i + 3]
+					(grayscaleRgbVal * (alpha / 255.0)).toInt()
+				} else {
+					grayscaleRgbVal
+				}
+				outputImageLine.scanline[colIndex] = grayscaleVal
+			}
+			outputPngWriter.writeRow(outputImageLine, rowIndex)
+		}
+
+		inputPngReader.end()
+		outputPngWriter.end()
+		return byteArrayOutputStream.toByteArray()
+	}
+
+	/**
+	 * Gets the grayscale value from red, green, and blue provided values.
+	 */
+	private fun getGrayscaleValue(r: Int, g: Int, b: Int): Int {
+		return (r * 0.299 + g * 0.587 + b * 0.114).toInt()
+	}
+
+	/**
+	 * Gets the grayscale value from a RGB hexidecimal value.
+	 */
+	private fun getGrayscaleValue(rgbValue: Int): Int {
+		val r = rgbValue shr 16
+		val g = (rgbValue shr 8) and 0xff
+		val b = rgbValue and 0xff
+		val grayscaleVal = getGrayscaleValue(r, g, b) and 0xff
+		return ((grayscaleVal shl 16) or (grayscaleVal shl 8) or grayscaleVal)
+	}
 }
 
 inline fun <T> MutableList<T>.removeFirst(predicate: (T) -> Boolean): T {
@@ -195,44 +261,16 @@ fun Context.getThemeColor(
 	return resources.getColor(colorRes, theme)
 }
 
-/**
- * Iterate through the given components to find the component that is
- * horizontally aligned, to the right, to the component matched by the predicate
- */
-fun findAdjacentComponent(components: Iterable<RHMIComponent>, predicate: (RHMIComponent) -> Boolean): RHMIComponent? {
-	val found = components.firstOrNull(predicate) ?: return null
-	val layout = getComponentLayout(found)
-	val foundLocation = getComponentLocation(found, layout)
-	val neighbors = components.filter {
-		val location = getComponentLocation(it, layout)
-		abs(foundLocation.second - location.second) < 10 && // same height
-				foundLocation.first < location.first    // first compnent left of second
-	}
-	return neighbors.sortedBy {
-		getComponentLocation(it, layout).first
-	}.firstOrNull()
-}
-
-fun getComponentLayout(component: RHMIComponent): Int {
-	val xProperty = component.properties.get(20)
-	return if (xProperty is RHMIProperty.LayoutBag) {
-		xProperty.values.keys.firstOrNull { (xProperty.values[it] as Int) < 1600 } ?: 0
-	} else {
-		0
+fun loadJSON(str: String?): JSONObject? {
+	if (str == null) return null
+	try {
+		return JSONObject(str)
+	} catch (e: JSONException) {
+		return null
 	}
 }
-fun getComponentLocation(component: RHMIComponent, layout: Int = 0): Pair<Int, Int> {
-	val xProperty = component.properties[20]
-	val yProperty = component.properties[21]
-	val x = when (xProperty) {
-		is RHMIProperty.SimpleProperty -> xProperty.value as Int
-		is RHMIProperty.LayoutBag -> xProperty.get(layout) as Int
-		else -> -1
-	}
-	val y = when (yProperty) {
-		is RHMIProperty.SimpleProperty -> yProperty.value as Int
-		is RHMIProperty.LayoutBag -> yProperty.get(layout) as Int
-		else -> -1
-	}
-	return Pair(x,y)
+fun JSONObject.toMap(): Map<String, Any?> {
+	return this.keys().asSequence().map {
+		it to this[it]
+	}.toMap()
 }
