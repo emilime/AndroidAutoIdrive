@@ -2,8 +2,9 @@ package me.hufman.androidautoidrive.carapp.music
 
 import android.content.Context
 import me.hufman.androidautoidrive.AppSettings
-import me.hufman.androidautoidrive.MutableAppSettings
-import me.hufman.idriveconnectionkit.android.IDriveConnectionListener
+import me.hufman.androidautoidrive.AppSettingsViewer
+import me.hufman.idriveconnectionkit.android.IDriveConnectionStatus
+import me.hufman.idriveconnectionkit.android.IDriveConnectionObserver
 import java.lang.Exception
 
 /**
@@ -13,13 +14,24 @@ import java.lang.Exception
  *     Bluetooth app connection (the Connected app uses a distinct TCP port for each transport)
  *     USB app connection if the phone has AOAv2 audio support (generally, running an OS earlier than Oreo)
  */
-class MusicAppMode(val capabilities: Map<String, String?>, val appSettings: MutableAppSettings, val spotifyVersion: String?) {
+class MusicAppMode(val iDriveConnectionStatus: IDriveConnectionStatus, val capabilities: Map<String, String?>, val appSettings: AppSettings,
+                   val iHeartRadioVersion: String?, val pandoraVersion: String?, val spotifyVersion: String?) {
 	companion object {
 		fun build(capabilities: Map<String, String?>, context: Context): MusicAppMode {
+			val iHeartRadioVersion = try {
+				context.packageManager.getPackageInfo("com.pandora.android", 0).versionName
+			} catch (e: Exception) { null }
+			val pandoraVersion = try {
+				context.packageManager.getPackageInfo("com.clearchannel.iheartradio.connect", 0).versionName
+			} catch (e: Exception) {
+				try {
+					context.packageManager.getPackageInfo("com.clearchannel.iheartradio.controller", 0).versionName
+				} catch (e: Exception) { null }
+			}
 			val spotifyVersion = try {
 				context.packageManager.getPackageInfo("com.spotify.music", 0).versionName
 			} catch (e: Exception) { null }
-			return MusicAppMode(capabilities, MutableAppSettings(context), spotifyVersion)
+			return MusicAppMode(IDriveConnectionObserver(), capabilities, AppSettingsViewer(), iHeartRadioVersion, pandoraVersion, spotifyVersion)
 		}
 	}
 
@@ -41,10 +53,17 @@ class MusicAppMode(val capabilities: Map<String, String?>, val appSettings: Muta
 				}
 			}
 		}
+		fun toPort(): Int {
+			return when (this) {
+				USB -> 4004
+				BT -> 4007
+				ETH -> 4008
+			}
+		}
 	}
 
 	fun isBTConnection(): Boolean {
-		return TRANSPORT_PORTS.fromPort(IDriveConnectionListener.port) == TRANSPORT_PORTS.BT
+		return TRANSPORT_PORTS.fromPort(iDriveConnectionStatus.port) == TRANSPORT_PORTS.BT
 	}
 	fun supportsUsbAudio(): Boolean {
 		return appSettings[AppSettings.KEYS.AUDIO_SUPPORTS_USB].toBoolean()
@@ -58,6 +77,9 @@ class MusicAppMode(val capabilities: Map<String, String?>, val appSettings: Muta
 		val useBT = isBTConnection()
 		return useUSB || useBT
 	}
+	fun isId4(): Boolean {
+		return capabilities["hmi.type"]?.contains("ID4") == true
+	}
 	fun shouldId5Playback(): Boolean {
 		val idrive4 = capabilities["hmi.type"]?.contains("ID4") == true
 		val manualOverride = !idrive4 && appSettings[AppSettings.KEYS.FORCE_SPOTIFY_LAYOUT].toBoolean()
@@ -69,5 +91,16 @@ class MusicAppMode(val capabilities: Map<String, String?>, val appSettings: Muta
 		)
 		val autodetect = !idrive4 && newSpotifyInstalled && shouldRequestAudioContext()
 		return manualOverride || autodetect
+	}
+
+	/** If a single official Radio app is running, return that name */
+	fun getRadioAppName(): String? {
+		if (!isBTConnection()) return null  // no official radio apps run over USB
+
+		return if (iHeartRadioVersion != null && pandoraVersion == null) {
+			"iHeartRadio"
+		} else if (iHeartRadioVersion == null && pandoraVersion != null) {
+			"Pandora"
+		} else null
 	}
 }

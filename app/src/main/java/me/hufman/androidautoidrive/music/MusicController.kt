@@ -7,6 +7,7 @@ import android.util.Log
 import kotlinx.coroutines.*
 import kotlinx.coroutines.android.asCoroutineDispatcher
 import me.hufman.androidautoidrive.AppSettings
+import me.hufman.androidautoidrive.MutableAppSettingsReceiver
 import me.hufman.androidautoidrive.music.controllers.CombinedMusicAppController
 import me.hufman.androidautoidrive.music.controllers.MusicAppController
 import me.hufman.androidautoidrive.music.controllers.SpotifyAppController
@@ -39,6 +40,7 @@ class MusicController(val context: Context, val handler: Handler): CoroutineScop
 			musicSessions.Connector(context)
 	)
 	val connector = CombinedMusicAppController.Connector(connectors)
+	val appSettings = MutableAppSettingsReceiver(context, handler)
 
 	var disableAutoswitchUntil = 0L
 	var lastConnectTime = 0L
@@ -142,12 +144,12 @@ class MusicController(val context: Context, val handler: Handler): CoroutineScop
 
 	/** Remember this app as the last one to play */
 	fun saveDesiredApp(app: MusicAppInfo) {
-		AppSettings.saveSetting(context, AppSettings.KEYS.AUDIO_DESIRED_APP, app.packageName)
+		appSettings[AppSettings.KEYS.AUDIO_DESIRED_APP] = app.packageName
 	}
 
 	/** Return the packageName of the last app to play */
 	fun loadDesiredApp(): String {
-		return AppSettings[AppSettings.KEYS.AUDIO_DESIRED_APP]
+		return appSettings[AppSettings.KEYS.AUDIO_DESIRED_APP]
 	}
 
 	fun isConnected(): Boolean {
@@ -170,7 +172,10 @@ class MusicController(val context: Context, val handler: Handler): CoroutineScop
 	fun play() {
 		desiredPlayback = true
 		asyncControl { controller ->
-			controller.play()
+			// some apps interrupt the audio when already playing during play()
+			if (getPlaybackPosition().playbackPaused) {
+				controller.play()
+			}
 		}
 	}
 	fun playFromSearch(search: String) = asyncControl { controller ->
@@ -262,7 +267,7 @@ class MusicController(val context: Context, val handler: Handler): CoroutineScop
 
 	/* Current state */
 	/** Gets the current queue */
-	fun getQueue(): List<MusicMetadata>? {
+	fun getQueue(): QueueMetadata? {
 		return withController { controller ->
 			return controller.getQueue()
 		}

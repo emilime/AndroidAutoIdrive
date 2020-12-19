@@ -6,13 +6,13 @@ import android.content.Context
 import android.content.Intent
 import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
 import android.os.Build
-import android.support.v4.app.NotificationCompat
-import android.support.v4.app.NotificationManagerCompat
 import android.util.Log
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import me.hufman.androidautoidrive.ApplicationCallbacks
 import me.hufman.androidautoidrive.PhoneAppResources
 import me.hufman.androidautoidrive.R
-import me.hufman.androidautoidrive.Utils
+import me.hufman.androidautoidrive.utils.Utils
 
 open class AssistantControllerAndroid(val context: Context, val phoneAppResources: PhoneAppResources): AssistantController {
 	companion object {
